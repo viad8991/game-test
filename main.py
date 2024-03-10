@@ -17,18 +17,24 @@ skaffolds = [
     Scaffold(SCREEN_WIDTH - 20, 0, 20, SCREEN_HEIGHT),
     # left
     Scaffold(0, 0, 20, SCREEN_HEIGHT),
-
+    # shelf
+    Scaffold(0, SCREEN_HEIGHT - 150, 500, 20),
 ]
 
 main_sprites = pygame.sprite.Group()
 main_sprites.add(player, skaffolds)
 
-while True:
+paused = False
+running = True
+while running:
     for event in pygame.event.get():
         Utils.quit(event)
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_p:
+                paused = not paused
 
-    main_sprites.update(skaffolds)
-    utils.screen.fill(WHITE)
-    main_sprites.draw(utils.screen)
-
-    utils.update()
+    if not paused:
+        main_sprites.update(skaffolds)
+        utils.screen.fill(WHITE)
+        main_sprites.draw(utils.screen)
+        utils.update()
