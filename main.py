@@ -1,46 +1,34 @@
 import pygame
-
-from camera import Camera
 from const import *
-from platform_sprite import Floor
-from player_sprite import Player
+from player import Player
+from utils import Utils
+from scaffold import Scaffold
 
-pygame.init()
-pygame.display.set_caption("Game")
+utils = Utils()
 
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+player = Player()
 
-main_group_sprites = pygame.sprite.Group()
-platforms_group_sprites = pygame.sprite.Group()
-bullets_group_sprites = pygame.sprite.Group()
+skaffolds = [
+    # top
+    Scaffold(x=0, y=0, width=SCREEN_WIDTH, height=20),
+    # bottom
+    Scaffold(0, SCREEN_HEIGHT - 40, SCREEN_WIDTH, 40),
+    # right
+    Scaffold(SCREEN_WIDTH - 20, 0, 20, SCREEN_HEIGHT),
+    # left
+    Scaffold(0, 0, 20, SCREEN_HEIGHT),
 
-floor = Floor()
-platforms_group_sprites.add(floor)
+]
 
-player = Player(main_group_sprites, platforms_group_sprites, bullets_group_sprites)
+main_sprites = pygame.sprite.Group()
+main_sprites.add(player, skaffolds)
 
-main_group_sprites.add(player, floor)
-
-camera = Camera(GAME_WIDTH, GAME_HEIGHT)
-
-running = True
-while running:
+while True:
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
-            if event.key == pygame.K_KP5:
-                player.shoot(event.type == pygame.KEYDOWN)
+        Utils.quit(event)
 
-    main_group_sprites.update()
-    camera.update(player)
-    screen.fill(WHITE)
+    main_sprites.update(skaffolds)
+    utils.screen.fill(WHITE)
+    main_sprites.draw(utils.screen)
 
-    for entity in main_group_sprites:
-        screen.blit(entity.image, camera.apply(entity))
-
-    pygame.display.flip()
-
-    pygame.time.Clock().tick(60)
-
-pygame.quit()
+    utils.update()
