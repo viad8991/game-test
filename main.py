@@ -32,6 +32,8 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_p:
                 paused = not paused
+            elif event.key == pygame.K_r:
+                player.reset_position()
 
     if not paused:
         main_sprites.update(skaffolds)

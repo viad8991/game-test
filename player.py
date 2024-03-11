@@ -21,6 +21,7 @@ class Player(Sprite):
         self.gravity = 0.6
         self.jump_velocity = -12
         self.vertical_speed = 0
+        self.max_vertical_speed = 10
 
         self.on_ground = False
 
@@ -39,23 +40,38 @@ class Player(Sprite):
         if (keys[pygame.K_w] or keys[pygame.K_UP]) and self.on_ground:
             self.vertical_speed = self.jump_velocity
             self.on_ground = False
-        if keys[pygame.K_s] or keys[pygame.K_DOWN]:
+        if (keys[pygame.K_s] or keys[pygame.K_DOWN]) and self.on_ground:
             dy += self.speed
 
-        self.vertical_speed += self.gravity
-        dy += self.vertical_speed
+        if not self.on_ground:
+            self.vertical_speed += self.gravity
+            dy += min(max(self.vertical_speed, -self.max_vertical_speed), self.max_vertical_speed)
+        else:
+            self.vertical_speed = 0
 
-        # работа с коллизиями
-        new_rect = self.rect.move(dx, dy)
+        self.rect.x += dx
+        self.collide(dx, 0, scaffolds)
+
+        self.rect.y += dy
+        self.collide(0, dy, scaffolds)
+
+    def collide(self, dx, dy, scaffolds):
+        on_ground_temp = False
         for scaffold in scaffolds:
-            if new_rect.colliderect(scaffold.rect):
-                # collision_rect = new_rect.clip(scaffold.rect)
-                if self.vertical_speed > 0:
+            if self.rect.colliderect(scaffold.rect):
+                if dy > 0:
                     self.rect.bottom = scaffold.rect.top
-                    self.on_ground = True
+                    on_ground_temp = True
                     self.vertical_speed = 0
-                elif self.vertical_speed < 0:
+                if dy < 0:
                     self.rect.top = scaffold.rect.bottom
                     self.vertical_speed = 0
+                if dx > 0:
+                    self.rect.right = scaffold.rect.left
+                if dx < 0:
+                    self.rect.left = scaffold.rect.right
+        self.on_ground = on_ground_temp
 
-        self.rect.move_ip(dx, dy)
+    def reset_position(self):
+        self.rect.x = SCREEN_WIDTH // 2
+        self.rect.y = SCREEN_HEIGHT // 2
