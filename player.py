@@ -64,8 +64,6 @@ class Player(Sprite):
         on_ground_temp = False
         for object in objects:
             if self.rect.colliderect(object.rect):
-                print(object)
-                print(type(object))
                 if isinstance(object, Enemy):
                     self.health -= 5
                 elif isinstance(object, Scaffold):
