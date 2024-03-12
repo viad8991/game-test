@@ -1,14 +1,17 @@
 import pygame
 from pygame.sprite import Sprite
 
+from bullet import Bullet
 from const import *
+from enemy import Enemy
+from scaffold import Scaffold
 
 
 class Player(Sprite):
     def __init__(self):
         super().__init__()
         self.image = pygame.Surface([10, 20])
-        self.image.fill(RED)
+        self.image.fill(GREEN)
 
         self.rect = self.image.get_rect()
         self.rect.x = SCREEN_WIDTH // 2
@@ -25,7 +28,9 @@ class Player(Sprite):
 
         self.on_ground = False
 
-    def update(self, scaffolds):
+        self.health = 100
+
+    def update(self, objects):
         keys = pygame.key.get_pressed()
 
         dx = 0
@@ -50,27 +55,35 @@ class Player(Sprite):
             self.vertical_speed = 0
 
         self.rect.x += dx
-        self.collide(dx, 0, scaffolds)
+        self.collide(dx, 0, objects)
 
         self.rect.y += dy
-        self.collide(0, dy, scaffolds)
+        self.collide(0, dy, objects)
 
-    def collide(self, dx, dy, scaffolds):
+    def collide(self, dx, dy, objects):
         on_ground_temp = False
-        for scaffold in scaffolds:
-            if self.rect.colliderect(scaffold.rect):
-                if dy > 0:
-                    self.rect.bottom = scaffold.rect.top
-                    on_ground_temp = True
-                    self.vertical_speed = 0
-                if dy < 0:
-                    self.rect.top = scaffold.rect.bottom
-                    self.vertical_speed = 0
-                if dx > 0:
-                    self.rect.right = scaffold.rect.left
-                if dx < 0:
-                    self.rect.left = scaffold.rect.right
+        for object in objects:
+            if self.rect.colliderect(object.rect):
+                print(object)
+                print(type(object))
+                if isinstance(object, Enemy):
+                    self.health -= 5
+                elif isinstance(object, Scaffold):
+                    if dy > 0:
+                        self.rect.bottom = object.rect.top
+                        on_ground_temp = True
+                        self.vertical_speed = 0
+                    if dy < 0:
+                        self.rect.top = object.rect.bottom
+                        self.vertical_speed = 0
+                    if dx > 0:
+                        self.rect.right = object.rect.left
+                    if dx < 0:
+                        self.rect.left = object.rect.right
         self.on_ground = on_ground_temp
+
+    def shot(self):
+        return Bullet(self.rect.centerx, self.rect.centery, self.face_direction)
 
     def reset_position(self):
         self.rect.x = SCREEN_WIDTH // 2

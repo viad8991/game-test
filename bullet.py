@@ -16,7 +16,11 @@ class Bullet(Sprite):
 
         self.direction = direction
 
-    def update(self):
+    def update(self, scaffolds):
+        for scaffold in scaffolds:
+            if self.rect.colliderect(scaffold.rect):
+                self.kill()
+
         # TODO 1 left more right
         if self.direction == "right":
             self.rect.x += self.speed

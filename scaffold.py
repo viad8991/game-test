@@ -1,6 +1,5 @@
 import pygame
 from const import *
-from player import Player
 
 
 class Scaffold(pygame.sprite.Sprite):
@@ -12,6 +11,3 @@ class Scaffold(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-
-    def check_collision(self, player: Player):
-        return self.rect.collidedict(player)
