@@ -11,7 +11,7 @@ utils = Utils()
 
 player = Player()
 enemy = Enemy(player)
-camera = Camera(utils.screen, GAME_WIDTH, GAME_HEIGHT)
+camera = Camera(utils.screen, player, GAME_WIDTH, GAME_HEIGHT)
 
 skaffolds = [
     # top
@@ -27,9 +27,10 @@ skaffolds = [
 ]
 
 main_sprites = pygame.sprite.Group()
-main_sprites.add(player, enemy, skaffolds)
+main_sprites.add(player, skaffolds)
 enemy_sprites = pygame.sprite.Group()
-enemy_sprites.add()
+enemy_sprites.add(enemy)
+bullets = []
 
 paused = False
 running = True
@@ -43,14 +44,18 @@ while running:
                 player.reset_position()
             if event.key == pygame.K_SPACE:
                 bullet = player.shot()
+                bullets.append(bullet)
                 main_sprites.add(bullet)
 
     if not paused:
         main_sprites.update(skaffolds + [enemy])
+        enemy_sprites.update(skaffolds + bullets)
         utils.screen.fill(WHITE)
-        camera.update(player)
 
-        for sprite in main_sprites:
+        all_sprites = pygame.sprite.Group()
+        all_sprites.add(main_sprites, enemy_sprites)
+        for sprite in all_sprites:
             utils.screen.blit(sprite.image, camera.apply(sprite))
 
+        camera.update()
         utils.update()

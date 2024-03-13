@@ -13,12 +13,13 @@ class Bullet(Sprite):
         self.rect.centerx = x
         self.rect.centery = y
         self.speed = 10
+        self.damage = 10
 
         self.direction = direction
 
-    def update(self, scaffolds):
-        for scaffold in scaffolds:
-            if self.rect.colliderect(scaffold.rect):
+    def update(self, objects):
+        for object in objects:
+            if self.rect.colliderect(object.rect):
                 self.kill()
 
         # TODO 1 left more right

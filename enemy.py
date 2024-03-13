@@ -1,6 +1,8 @@
 import random
 
 import pygame
+
+from bullet import Bullet
 from const import *
 from scaffold import Scaffold
 
@@ -35,8 +37,8 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.y = player.rect.y
 
     def update(self, objects):
-        if self.player is None:
-            return
+        if self.health <= 0:
+            self.kill()
 
         dx = 0
         dy = 0
@@ -61,17 +63,23 @@ class Enemy(pygame.sprite.Sprite):
     def collide(self, dx, dy, objects):
         on_ground_temp = False
         for object in objects:
-            if isinstance(object, Scaffold) and self.rect.colliderect(object.rect):
-                scaffold = object
-                if dy > 0:
-                    self.rect.bottom = scaffold.rect.top
-                    on_ground_temp = True
-                    self.vertical_speed = 0
-                if dy < 0:
-                    self.rect.top = scaffold.rect.bottom
-                    self.vertical_speed = 0
-                if dx > 0:
-                    self.rect.right = scaffold.rect.left
-                if dx < 0:
-                    self.rect.left = scaffold.rect.right
+            if self.rect.colliderect(object.rect):
+                if isinstance(object, Scaffold):
+                    scaffold = object
+                    if dy > 0:
+                        self.rect.bottom = scaffold.rect.top
+                        on_ground_temp = True
+                        self.vertical_speed = 0
+                    if dy < 0:
+                        self.rect.top = scaffold.rect.bottom
+                        self.vertical_speed = 0
+                    if dx > 0:
+                        self.rect.right = scaffold.rect.left
+                    if dx < 0:
+                        self.rect.left = scaffold.rect.right
+                elif isinstance(object, Bullet):
+                    print("object is bullet", "enemy health", self.health, type(object), len(objects), objects)
+                    bullet = object
+                    self.health -= bullet.damage
+
         self.on_ground = on_ground_temp
