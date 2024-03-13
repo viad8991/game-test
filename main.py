@@ -11,7 +11,7 @@ utils = Utils()
 
 player = Player()
 enemy = Enemy(player)
-camera = Camera(GAME_WIDTH, GAME_HEIGHT)
+camera = Camera(utils.screen, GAME_WIDTH, GAME_HEIGHT)
 
 skaffolds = [
     # top
@@ -47,8 +47,8 @@ while running:
 
     if not paused:
         main_sprites.update(skaffolds + [enemy])
-        camera.update(player)
         utils.screen.fill(WHITE)
+        camera.update(player)
 
         for sprite in main_sprites:
             utils.screen.blit(sprite.image, camera.apply(sprite))
